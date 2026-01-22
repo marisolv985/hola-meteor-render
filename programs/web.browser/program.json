@@ -1,0 +1,67 @@
+{
+  "format": "web-program-pre1",
+  "manifest": [
+    {
+      "path": "923dbbf292e6c7aa3b99470f7c866278728769f7.js",
+      "where": "client",
+      "type": "js",
+      "cacheable": true,
+      "url": "/923dbbf292e6c7aa3b99470f7c866278728769f7.js?meteor_js_resource=true",
+      "size": 455886,
+      "hash": "923dbbf292e6c7aa3b99470f7c866278728769f7",
+      "sri": "+IQ/V0jG6+vpJb4p8eut9nstugfR8RJw/AIQu9LAHt0ySPyPVdtWicZK9/01T+TKz7e+Ls3gKufJIefQaVHAhw=="
+    },
+    {
+      "path": "923dbbf292e6c7aa3b99470f7c866278728769f7.stats.json",
+      "where": "client",
+      "type": "json",
+      "cacheable": true,
+      "url": "/923dbbf292e6c7aa3b99470f7c866278728769f7.stats.json?meteor_js_resource=true",
+      "size": 17452,
+      "hash": "d67c222a36bddc4859851ace93c26d82ff5fbcbc",
+      "sri": "EAtcrCN4uwZdYT/DVUClNYuq+JN5gzVEeTcb8AN+Fla7bv1/Gb4eB2IJN3PpzNb8a9kOeneU0UBfp1FRB+cl1g=="
+    },
+    {
+      "path": "f364c34e847754103ccf385255a9156599f15a0f.css",
+      "where": "client",
+      "type": "css",
+      "cacheable": true,
+      "url": "/f364c34e847754103ccf385255a9156599f15a0f.css?meteor_css_resource=true",
+      "size": 34,
+      "hash": "f364c34e847754103ccf385255a9156599f15a0f",
+      "sri": "Zj0Z62gNFDKq2nFwAKHrU9iieLVa7VgdilUUnjejI1gzdCvRGUH2xM/5puPGyeTb49NH88fUhilgyuaVeIEYrA=="
+    },
+    {
+      "path": "packages/promise/promise.d.ts",
+      "where": "client",
+      "type": "asset",
+      "cacheable": false,
+      "url": "/packages/promise/promise.d.ts",
+      "size": 633,
+      "hash": "4aa461da7ad90c74a51ddfccc84b055fc0403119",
+      "sri": "6MVw86BmnkmTtXXlCxaH8k7xIUcMZK4O57Nnu82uI5MJT9Fbru7Yv71SuHx+giKUM9wkRs7WkpqPWjADS+U2qw=="
+    },
+    {
+      "path": "packages/tracker/tracker.d.ts",
+      "where": "client",
+      "type": "asset",
+      "cacheable": false,
+      "url": "/packages/tracker/tracker.d.ts",
+      "size": 6096,
+      "hash": "93ebe1d7d6aed2b029129079014e3ebfd5e8bb8c",
+      "sri": "D7pwjdFz5YPTxAyDXrqMNZ9v65eWU+XZ8ASp8aLJaTSkoBScGaLOCxlnSzLKyfsYugreqjaynnaiUGpNhW/ldw=="
+    },
+    {
+      "path": "head.html",
+      "where": "internal",
+      "type": "head",
+      "hash": "f1eb78925a7a793ebcfb31154d7c038cde23228b"
+    },
+    {
+      "path": "body.html",
+      "where": "internal",
+      "type": "body",
+      "hash": "33a76f2b4c30f6e44559d748578e1b43c573b579"
+    }
+  ]
+}
