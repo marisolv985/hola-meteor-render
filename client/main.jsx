@@ -1,145 +1,21 @@
 import React, { useState } from 'react';
+import { Meteor } from 'meteor/meteor';
 import { createRoot } from 'react-dom/client';
 import ReCAPTCHA from 'react-google-recaptcha';
-import { Meteor } from 'meteor/meteor';
 
-/* ---------- ESTILOS ---------- */
-const styles = {
-  page: {
-    minHeight: '100vh',
-    background: '#f4f6f8',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    fontFamily:
-      '-apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", Helvetica, Arial, sans-serif'
-  },
-  card: {
-    background: '#fff',
-    padding: '32px',
-    borderRadius: '14px',
-    width: '100%',
-    maxWidth: '480px',
-    boxShadow: '0 18px 40px rgba(0,0,0,0.14)'
-  },
-  title: {
-    textAlign: 'center',
-    marginBottom: '6px',
-    fontWeight: '600',
-    fontSize: '24px'
-  },
-  subtitle: {
-    textAlign: 'center',
-    color: '#6b7280',
-    marginBottom: '26px',
-    fontSize: '14px'
-  },
-  field: {
-    marginBottom: '18px'
-  },
-  label: {
-    fontSize: '13px',
-    fontWeight: '600',
-    marginBottom: '6px',
-    display: 'block',
-    letterSpacing: '0.3px',
-    color: '#374151'
-  },
-  inputWrapper: {
-    position: 'relative'
-  },
-  icon: {
-    position: 'absolute',
-    left: '12px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    width: '18px',
-    height: '18px',
-    fill: '#6b7280'
-  },
-  input: {
-    width: '100%',
-    padding: '13px 14px 13px 42px',
-    borderRadius: '10px',
-    border: '1px solid #d1d5db',
-    fontSize: '14px',
-    background: '#fff',
-    boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.1)',
-    outline: 'none',
-    transition: 'all .25s ease'
-  },
-  button: {
-    width: '100%',
-    padding: '14px',
-    background: '#4f46e5',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '12px',
-    fontSize: '16px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    marginTop: '20px',
-    transition: 'transform .15s ease, box-shadow .15s ease',
-    boxShadow: '0 8px 18px rgba(79,70,229,.4)'
-  },
-  success: {
-    color: '#15803d',
-    marginTop: '10px',
-    textAlign: 'center',
-    fontWeight: '600',
-    fontSize: '14px'
-  }
-};
-
-/* ---------- ICONOS SVG ---------- */
-const UserIcon = () => (
-  <svg viewBox="0 0 24 24" style={styles.icon}>
-    <path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
-  </svg>
-);
-
-const AgeIcon = () => (
-  <svg viewBox="0 0 24 24" style={styles.icon}>
-    <path d="M12 2c.6 0 1 .4 1 1v2h-2V3c0-.6.4-1 1-1zm6 6H6c-1.1 0-2 .9-2 2v10h16V10c0-1.1-.9-2-2-2z" />
-  </svg>
-);
-
-const MailIcon = () => (
-  <svg viewBox="0 0 24 24" style={styles.icon}>
-    <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" />
-  </svg>
-);
-
-/* ---------- 404 ---------- */
-const NotFound = () => (
-  <div style={styles.page}>
-    <div style={styles.card}>
-      <h1 style={{ fontSize: '64px', textAlign: 'center' }}>404</h1>
-      <p style={{ textAlign: 'center', color: '#6b7280' }}>
-        La página que buscas no existe.
-      </p>
-      <button
-        style={styles.button}
-        onClick={() => (window.location.href = '/')}
-      >
-        Volver al inicio
-      </button>
-    </div>
-  </div>
-);
+import Navbar from '/imports/ui/Navbar';
+import Carousel from '/imports/ui/Carousel';
+import Registro from '/imports/ui/Registro';
+import NotFound from '/imports/ui/NotFound';
+import AlertModal from '/imports/ui/AlertModal';
 
 /* ---------- APP ---------- */
 const App = () => {
-  if (window.location.pathname !== '/') return <NotFound />;
+  const path = window.location.pathname;
 
   const [verified, setVerified] = useState(false);
-  const [form, setForm] = useState({
-    nombre: '',
-    edad: '',
-    correo: '',
-    telefono: '',
-    fecha: ''
-  });
+  const [alertMessage, setAlertMessage] = useState('');
+  const [enviado, setEnviado] = useState(false);
 
   const onCaptchaChange = (value) => {
     Meteor.call('verifyRecaptcha', value, (_, res) => {
@@ -147,90 +23,128 @@ const App = () => {
     });
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const enviarHome = () => {
+    if (!verified) {
+      setAlertMessage('Por favor, verifica el reCAPTCHA antes de continuar.');
+      return;
+    }
 
-    if (name === 'nombre' && !/^[a-zA-ZáéíóúÁÉÍÓÚ\s]*$/.test(value)) return;
-    if ((name === 'edad' || name === 'telefono') && !/^\d*$/.test(value)) return;
-    if (name === 'telefono' && value.length > 10) return;
-
-    setForm({ ...form, [name]: value });
+    setAlertMessage('Los datos se enviaron correctamente.');
+    setEnviado(true);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!verified) return alert('Verifica el reCAPTCHA');
-    window.location.href = '/form-enviado';
+  const irARegistro = () => {
+    window.location.pathname = '/registro';
   };
 
   return (
-    <div style={styles.page}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>Hola mundo</h1>
-        <p style={styles.subtitle}>Marisol González Villa</p>
+    <>
+      <Navbar />
 
-        <form onSubmit={handleSubmit}>
-          <div style={styles.field}>
-            <label style={styles.label}>Nombre</label>
-            <div style={styles.inputWrapper}>
-              <UserIcon />
-              <input style={styles.input} name="nombre" value={form.nombre} onChange={handleChange} required />
-            </div>
-          </div>
-
-          <div style={styles.field}>
-            <label style={styles.label}>Edad</label>
-            <div style={styles.inputWrapper}>
-              <AgeIcon />
-              <input style={styles.input} name="edad" value={form.edad} onChange={handleChange} required />
-            </div>
-          </div>
-
-          <div style={styles.field}>
-            <label style={styles.label}>Correo</label>
-            <div style={styles.inputWrapper}>
-              <MailIcon />
-              <input style={styles.input} type="email" name="correo" value={form.correo} onChange={handleChange} required />
-            </div>
-          </div>
-
-          <div style={styles.field}>
-            <label style={styles.label}>Teléfono</label>
-            <input
-              style={{ ...styles.input, paddingLeft: '14px' }}
-              name="telefono"
-              value={form.telefono}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div style={styles.field}>
-            <label style={styles.label}>Fecha</label>
-            <input
-              style={{ ...styles.input, paddingLeft: '14px' }}
-              type="date"
-              name="fecha"
-              value={form.fecha}
-              onChange={handleChange}
-              required
-            />
-          </div>
+      {/* ---------- HOME ---------- */}
+      {path === '/' && (
+        <div style={styles.homeCard}>
+          <Carousel />
 
           <ReCAPTCHA
             sitekey="6Lf11kksAAAAAPt3x7ooW5_9BcGTWB9Prg_7h-Fn"
             onChange={onCaptchaChange}
           />
 
-          {verified && <p style={styles.success}>✔ Captcha verificado</p>}
+          {/* BOTÓN DINÁMICO */}
+          {!enviado ? (
+            <button
+              onClick={enviarHome}
+              style={styles.primaryButton}
+            >
+              Enviar
+            </button>
+          ) : (
+            <button
+              onClick={irARegistro}
+              style={styles.registerButton}
+            >
+              Ir a registrarse
+            </button>
+          )}
 
-          <button style={styles.button} type="submit">
-            Enviar
+          {/* BOTÓN IR A OTRA PÁGINA */}
+          <button
+            onClick={() => (window.location.pathname = '/otra-pagina')}
+            style={styles.secondaryButton}
+          >
+            Ir a otra página(simulada error 404)
           </button>
-        </form>
-      </div>
-    </div>
+        </div>
+      )}
+
+      {/* ---------- REGISTRO ---------- */}
+      {path === '/registro' && <Registro />}
+
+      {/* ---------- NOT FOUND ---------- */}
+      {path !== '/' && path !== '/registro' && <NotFound />}
+
+      {/* ---------- ALERTA BONITA ---------- */}
+      <AlertModal
+  message={alertMessage}
+  onClose={() => {
+    if (alertMessage === 'Los datos se enviaron correctamente.') {
+      setEnviado(true);
+    }
+    setAlertMessage('');
+  }}
+/>
+
+    </>
   );
+};
+
+/* ---------- ESTILOS ---------- */
+const styles = {
+  homeCard: {
+    maxWidth: '480px',
+    margin: '60px auto',
+    padding: '32px',
+    background: '#ffffff',
+    borderRadius: '8px',
+    boxShadow: '0 10px 25px rgba(0,0,0,0.12)',
+    fontFamily: '"Segoe UI", Roboto, Helvetica, Arial'
+  },
+  primaryButton: {
+    width: '100%',
+    marginTop: '20px',
+    padding: '14px',
+    background: '#1f2937',
+    color: '#f9fafb',
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '15px',
+    fontWeight: 600,
+    cursor: 'pointer'
+  },
+  registerButton: {
+    width: '100%',
+    marginTop: '20px',
+    padding: '14px',
+    background: '#2563eb', // azul para diferenciar
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '15px',
+    fontWeight: 600,
+    cursor: 'pointer'
+  },
+  secondaryButton: {
+    width: '100%',
+    marginTop: '12px',
+    padding: '12px',
+    background: '#e5e7eb',
+    color: '#1f2937',
+    border: '1px solid #9ca3af',
+    borderRadius: '6px',
+    fontSize: '14px',
+    cursor: 'pointer'
+  }
 };
 
 /* ---------- START ---------- */
