@@ -7,7 +7,7 @@ RUN curl https://install.meteor.com/ | sh
 WORKDIR /app
 COPY . .
 
-RUN meteor build --directory /build --server-only
+RUN meteor build --directory /build --server-only --allow-superuser
 
 WORKDIR /build/bundle/programs/server
 RUN npm install
