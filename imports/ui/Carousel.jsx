@@ -7,27 +7,28 @@ const Carousel = () => {
   const [alertMessage, setAlertMessage] = useState('');
 
   const handleUpload = (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length === 0) return;
+  const files = Array.from(e.target.files);
+  if (files.length === 0) return;
 
-    const contienePDF = files.some(
-      (file) => file.type === 'application/pdf'
-    );
+  // 🔒 SOLO IMÁGENES
+  const invalid = files.find(file => !file.type.startsWith('image/'));
 
-    if (contienePDF) {
-      setAlertMessage('No se permiten archivos PDF. Solo imágenes.');
-      return;
-    }
+  if (invalid) {
+    setAlertMessage('Solo se permiten archivos de imagen (JPG, PNG, etc).');
+    e.target.value = '';
+    return;
+  }
 
-    const newImages = files.map((file) => ({
-      url: URL.createObjectURL(file),
-      name: file.name
-    }));
+  const newImages = files.map((file) => ({
+    url: URL.createObjectURL(file),
+    name: file.name
+  }));
 
-    setImages((prev) => [...prev, ...newImages]);
-    setIndex(0);
-    setAlertMessage('Imagen(es) subida(s) correctamente.');
-  };
+  setImages((prev) => [...prev, ...newImages]);
+  setIndex(0);
+  setAlertMessage('Imagen(es) subida(s) correctamente.');
+};
+
 
   const prev = () => {
     setIndex((index + images.length - 1) % images.length);
