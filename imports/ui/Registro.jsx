@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import AlertModal from '/imports/ui/AlertModal';
 
-/* ---------- ICONO ---------- */
-const Icon = ({ path }) => (
+/* ---------- ICONOS SVG (CORREGIDOS) ---------- */
+const Icon = ({ children }) => (
   <svg
     width="18"
     height="18"
     viewBox="0 0 24 24"
-    fill="#6b7280"
+    fill="none"
+    stroke="#4b5563"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
     style={{
       position: 'absolute',
       left: 12,
@@ -15,109 +18,163 @@ const Icon = ({ path }) => (
       transform: 'translateY(-50%)'
     }}
   >
-    <path d={path} />
+    {children}
   </svg>
 );
 
 const icons = {
-  nombre:
-    'M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4 0-8 2-8 6v2h16v-2c0-4-4-6-8-6z',
-  apellidos:
-    'M16 11c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3zM8 11c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3zm0 2c-2.7 0-8 1.3-8 4v3h10v-3c0-1.3 1.3-2.4 3-3-1-.6-3.1-1-5-1zm8 0c-.3 0-.6 0-.9.1 1.6.8 2.9 1.9 2.9 2.9v3h6v-3c0-2.7-5.3-4-8-4z',
-  correo:
-    'M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4-8 5-8-5',
-  telefono:
-    'M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2a1 1 0 011.1-.3 11.3 11.3 0 003.8.6v4c-7.7 0-14-6.3-14-14h4c0 1.3.2 2.6.6 3.8a1 1 0 01-.3 1.1l-2.2 2.2z',
-  fecha:
-    'M7 2v2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2h-2V2h-2v2H9V2z',
-  archivo:
-    'M16.5 6.5v8.8c0 2.1-1.6 3.7-3.7 3.7S9.1 17.4 9.1 15.3V6.1c0-1.3 1-2.3 2.3-2.3s2.3 1 2.3 2.3v7.6c0 .6-.5 1.1-1.1 1.1s-1.1-.5-1.1-1.1V6.5'
+  nombre: (
+    <>
+      <circle cx="12" cy="7" r="4" />
+      <path d="M5.5 21a6.5 6.5 0 0113 0" />
+    </>
+  ),
+  apellido: (
+    <>
+      <circle cx="12" cy="7" r="4" />
+      <path d="M5.5 21a6.5 6.5 0 0113 0" />
+    </>
+  ),
+  correo: (
+    <>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M3 7l9 6 9-6" />
+    </>
+  ),
+  telefono: (
+    <>
+      <path d="M22 16.92V21a2 2 0 01-2.18 2A19.8 19.8 0 013 5.18 2 2 0 015 3h4l2 5-2.5 2.5" />
+    </>
+  ),
+  fecha: (
+    <>
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <path d="M16 2v4M8 2v4M3 10h18" />
+    </>
+  )
 };
 
-/* ---------- REGISTRO ---------- */
 const Registro = () => {
+  const hoy = new Date().toISOString().split('T')[0];
+
   const [form, setForm] = useState({
     nombre: '',
-    apellidos: '',
+    apellido: '',
     correo: '',
     telefono: '',
-    fecha: '',
-    archivo: null
+    fecha: ''
   });
 
-  const [alertMessage, setAlertMessage] = useState('');
+  const [errors, setErrors] = useState({});
+  const [enviado, setEnviado] = useState(false);
+  const [contador, setContador] = useState(0);
 
+  /* ---------- VALIDACIONES ---------- */
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, value } = e.target;
+    let error = '';
 
-    /* ----- ARCHIVO ----- */
-    if (name === 'archivo') {
-      const file = files[0];
-      if (!file) return;
-
-      if (file.size > 2 * 1024 * 1024) {
-        setAlertMessage('El archivo no debe superar 2 MB.');
+    /* NOMBRE / APELLIDO */
+    if (name === 'nombre' || name === 'apellido') {
+      if (value.length > 70) {
+        error = 'Máximo 70 caracteres.';
+        setErrors({ ...errors, [name]: error });
         return;
       }
-
-      setForm({ ...form, archivo: file });
-      return;
+      if (value.includes(' ')) {
+        error = 'No se permiten espacios.';
+        setErrors({ ...errors, [name]: error });
+        return;
+      }
+      if (!/^[A-Za-z]*$/.test(value)) {
+        error = 'Solo se permiten letras.';
+        setErrors({ ...errors, [name]: error });
+        return;
+      }
     }
 
-    /* ----- MÁXIMO 80 CARACTERES ----- */
-    if (
-      (name === 'nombre' || name === 'apellidos' || name === 'correo') &&
-      value.length > 80
-    ) {
-      setAlertMessage(
-        'Nombre, apellidos y correo tienen un máximo de 80 caracteres.'
-      );
-      return;
+    /* TELÉFONO */
+    if (name === 'telefono') {
+      if (value.length > 70) {
+        error = 'Máximo 70 caracteres.';
+        setErrors({ ...errors, [name]: error });
+        return;
+      }
+      if (!/^\d*$/.test(value)) {
+        error = 'Solo se permiten números.';
+        setErrors({ ...errors, [name]: error });
+        return;
+      }
+      if (value.length > 10) {
+        error = 'Máximo 10 dígitos.';
+        setErrors({ ...errors, [name]: error });
+        return;
+      }
     }
 
-    /* ----- SOLO LETRAS ----- */
-    if (
-      (name === 'nombre' || name === 'apellidos') &&
-      !/^[a-zA-ZáéíóúÁÉÍÓÚ\s]*$/.test(value)
-    ) {
-      setAlertMessage('Nombre y apellidos solo pueden contener letras.');
-      return;
-    }
-
-    /* ----- TELÉFONO ----- */
-    if (name === 'telefono' && !/^\d*$/.test(value)) {
-      setAlertMessage('El teléfono solo puede contener números.');
-      return;
-    }
-
-    if (name === 'telefono' && value.length > 10) {
-      setAlertMessage('El teléfono debe tener máximo 10 dígitos.');
+    /* FECHA */
+    if (name === 'fecha' && value > hoy) {
+      error = 'La fecha de nacimiento no puede ser futura.';
+      setErrors({ ...errors, [name]: error });
       return;
     }
 
     setForm({ ...form, [name]: value });
+    setErrors({ ...errors, [name]: '' });
   };
 
   const enviar = (e) => {
-    e.preventDefault();
+  e.preventDefault();
+  const e2 = {};
 
-    /* ----- CAMPOS VACÍOS ----- */
-    for (const campo in form) {
-      if (!form[campo]) {
-        setAlertMessage('Todos los campos son obligatorios.');
-        return;
-      }
-    }
+  if (!form.nombre) e2.nombre = 'El nombre es obligatorio.';
+  if (!form.apellido) e2.apellido = 'El apellido es obligatorio.';
+  if (!form.correo) e2.correo = 'El correo es obligatorio.';
+  if (form.telefono.length !== 10)
+    e2.telefono = 'Debe contener exactamente 10 números.';
+  if (!form.fecha)
+    e2.fecha = 'La fecha de nacimiento es obligatoria.';
 
-    /* ----- VALIDACIÓN EXACTA DE TELÉFONO ----- */
-    if (form.telefono.length !== 10) {
-      setAlertMessage(
-        'El número de teléfono debe contener exactamente 10 dígitos.'
-      );
-      return;
-    }
+  // ❌ Si hay errores, se muestran y NO se limpia nada
+  if (Object.keys(e2).length > 0) {
+    setErrors(e2);
+    return;
+  }
 
-    setAlertMessage('Formulario enviado correctamente.');
+  // ✅ SI TODO ESTÁ BIEN → LIMPIAR TODO
+  setErrors({});
+  setForm({
+    nombre: '',
+    apellido: '',
+    correo: '',
+    telefono: '',
+    fecha: ''
+  });
+
+  setEnviado(true);
+};
+
+
+
+  const guardar = () => {
+    setContador(contador + 1);
+    setEnviado(false);
+    setForm({
+      nombre: '',
+      apellido: '',
+      correo: '',
+      telefono: '',
+      fecha: ''
+    });
+    setErrors({});
+  };
+
+  const labels = {
+    nombre: 'Nombre',
+    apellido: 'Apellido',
+    correo: 'Correo',
+    telefono: 'Teléfono',
+    fecha: 'Fecha de nacimiento'
   };
 
   return (
@@ -125,12 +182,13 @@ const Registro = () => {
       <form style={styles.card} onSubmit={enviar}>
         <h2 style={styles.title}>Registro de Usuario</h2>
 
-        {['nombre', 'apellidos', 'correo', 'telefono', 'fecha'].map((campo) => (
+        {Object.keys(form).map((campo) => (
           <div key={campo} style={styles.field}>
+            <label style={styles.label}>{labels[campo]}</label>
+
             <div style={styles.inputWrapper}>
-              <Icon path={icons[campo]} />
+              <Icon>{icons[campo]}</Icon>
               <input
-                name={campo}
                 type={
                   campo === 'correo'
                     ? 'email'
@@ -138,53 +196,43 @@ const Registro = () => {
                     ? 'date'
                     : 'text'
                 }
-                placeholder={campo.charAt(0).toUpperCase() + campo.slice(1)}
+                name={campo}
                 value={form[campo]}
-                onChange={handleChange}
+                max={campo === 'fecha' ? hoy : undefined}
                 maxLength={
                   campo === 'nombre' ||
-                  campo === 'apellidos' ||
-                  campo === 'correo'
-                    ? 80
+                  campo === 'apellido' ||
+                  campo === 'telefono'
+                    ? 70
                     : undefined
                 }
+                onChange={handleChange}
                 style={styles.input}
               />
             </div>
+
+            {errors[campo] && (
+              <p style={styles.error}>{errors[campo]}</p>
+            )}
           </div>
         ))}
 
-        {/* SUBIR ARCHIVO */}
-        <div style={styles.field}>
-          <div style={styles.inputWrapper}>
-            <Icon path={icons.archivo} />
-            <input
-              type="file"
-              name="archivo"
-              accept="image/*,.pdf"
-              onChange={handleChange}
-              style={styles.input}
-            />
-          </div>
-        </div>
+        {!enviado ? (
+          <button style={styles.button}>Enviar</button>
+        ) : (
+          <button
+            type="button"
+            onClick={guardar}
+            style={{ ...styles.button, background: '#065f46' }}
+          >
+            Guardar
+          </button>
+        )}
 
-        {/* BOTÓN ENVIAR */}
-        <button style={styles.button}>Enviar</button>
-
-        {/* BOTÓN IR A OTRA PÁGINA */}
-        <button
-          type="button"
-          onClick={() => (window.location.pathname = '/otra-pagina')}
-          style={styles.secondaryButton}
-        >
-          Ir a otra página (simulada error 404)
-        </button>
+        <p style={styles.counter}>
+          Registros guardados: <strong>{contador}</strong>
+        </p>
       </form>
-
-      <AlertModal
-        message={alertMessage}
-        onClose={() => setAlertMessage('')}
-      />
     </div>
   );
 };
@@ -212,24 +260,34 @@ const styles = {
     color: '#111827',
     fontWeight: 600
   },
+  label: {
+    color: '#374151',
+    fontSize: '13px',
+    marginBottom: '4px',
+    display: 'block'
+  },
   field: {
-    marginBottom: '16px'
+    marginBottom: '14px'
   },
   inputWrapper: {
     position: 'relative'
   },
   input: {
     width: '100%',
-    padding: '12px 14px 12px 40px',
+    padding: '12px 14px 12px 44px',
     border: '1px solid #d1d5db',
     borderRadius: '6px',
     fontSize: '14px',
-    outline: 'none',
-     boxSizing: 'border-box' 
+    boxSizing: 'border-box'
+  },
+  error: {
+    color: '#dc2626',
+    fontSize: '12px',
+    marginTop: '4px'
   },
   button: {
     width: '100%',
-    marginTop: '10px',
+    marginTop: '16px',
     padding: '14px',
     background: '#1f2937',
     color: '#f9fafb',
@@ -239,16 +297,11 @@ const styles = {
     fontWeight: 600,
     cursor: 'pointer'
   },
-  secondaryButton: {
-    width: '100%',
-    marginTop: '12px',
-    padding: '12px',
-    background: '#e5e7eb',
-    color: '#1f2937',
-    border: '1px solid #9ca3af',
-    borderRadius: '6px',
+  counter: {
+    marginTop: '16px',
+    textAlign: 'center',
     fontSize: '14px',
-    cursor: 'pointer'
+    color: '#374151'
   }
 };
 

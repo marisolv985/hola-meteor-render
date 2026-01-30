@@ -6,10 +6,18 @@ const Carousel = () => {
   const [index, setIndex] = useState(0);
   const [alertMessage, setAlertMessage] = useState('');
 
-  /* ---------- SUBIR IMÁGENES ---------- */
   const handleUpload = (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
+
+    const contienePDF = files.some(
+      (file) => file.type === 'application/pdf'
+    );
+
+    if (contienePDF) {
+      setAlertMessage('No se permiten archivos PDF. Solo imágenes.');
+      return;
+    }
 
     const newImages = files.map((file) => ({
       url: URL.createObjectURL(file),
@@ -21,7 +29,6 @@ const Carousel = () => {
     setAlertMessage('Imagen(es) subida(s) correctamente.');
   };
 
-  /* ---------- NAVEGACIÓN ---------- */
   const prev = () => {
     setIndex((index + images.length - 1) % images.length);
   };
@@ -30,7 +37,6 @@ const Carousel = () => {
     setIndex((index + 1) % images.length);
   };
 
-  /* ---------- ELIMINAR IMAGEN ---------- */
   const eliminarImagen = () => {
     const nuevas = images.filter((_, i) => i !== index);
 
@@ -49,7 +55,6 @@ const Carousel = () => {
     <div style={styles.card}>
       <h3 style={styles.title}>Carrusel de Imágenes</h3>
 
-      {/* SUBIR IMÁGENES */}
       <label style={styles.upload}>
         📎 Agregar imágenes
         <input
@@ -61,7 +66,6 @@ const Carousel = () => {
         />
       </label>
 
-      {/* CONTENIDO */}
       {images.length > 0 ? (
         <>
           <div style={styles.imageWrapper}>
@@ -83,7 +87,6 @@ const Carousel = () => {
             Imagen {index + 1} de {images.length}
           </div>
 
-          {/* BOTÓN ELIMINAR */}
           <button onClick={eliminarImagen} style={styles.deleteButton}>
             Eliminar imagen
           </button>
@@ -94,7 +97,6 @@ const Carousel = () => {
         </div>
       )}
 
-      {/* ALERTA BONITA */}
       <AlertModal
         message={alertMessage}
         onClose={() => setAlertMessage('')}
@@ -103,7 +105,6 @@ const Carousel = () => {
   );
 };
 
-/* ---------- ESTILOS ---------- */
 const styles = {
   card: {
     marginBottom: '24px',
