@@ -66,15 +66,13 @@ const Registro = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const [enviado, setEnviado] = useState(false);
-  const [contador, setContador] = useState(0);
+  const [mensaje, setMensaje] = useState('');
 
-  /* ---------- VALIDACIONES ---------- */
+  /* ---------- VALIDACIONES (NO TOCADAS) ---------- */
   const handleChange = (e) => {
     const { name, value } = e.target;
     let error = '';
 
-    /* NOMBRE / APELLIDO */
     if (name === 'nombre' || name === 'apellido') {
       if (value.length > 70) {
         error = 'Máximo 70 caracteres.';
@@ -93,7 +91,6 @@ const Registro = () => {
       }
     }
 
-    /* TELÉFONO */
     if (name === 'telefono') {
       if (value.length > 70) {
         error = 'Máximo 70 caracteres.';
@@ -112,7 +109,6 @@ const Registro = () => {
       }
     }
 
-    /* FECHA */
     if (name === 'fecha' && value > hoy) {
       error = 'La fecha de nacimiento no puede ser futura.';
       setErrors({ ...errors, [name]: error });
@@ -123,42 +119,25 @@ const Registro = () => {
     setErrors({ ...errors, [name]: '' });
   };
 
+  /* ---------- ENVIAR ---------- */
   const enviar = (e) => {
-  e.preventDefault();
-  const e2 = {};
+    e.preventDefault();
+    const e2 = {};
 
-  if (!form.nombre) e2.nombre = 'El nombre es obligatorio.';
-  if (!form.apellido) e2.apellido = 'El apellido es obligatorio.';
-  if (!form.correo) e2.correo = 'El correo es obligatorio.';
-  if (form.telefono.length !== 10)
-    e2.telefono = 'Debe contener exactamente 10 números.';
-  if (!form.fecha)
-    e2.fecha = 'La fecha de nacimiento es obligatoria.';
+    if (!form.nombre) e2.nombre = 'El nombre es obligatorio.';
+    if (!form.apellido) e2.apellido = 'El apellido es obligatorio.';
+    if (!form.correo) e2.correo = 'El correo es obligatorio.';
+    if (form.telefono.length !== 10)
+      e2.telefono = 'Debe contener exactamente 10 números.';
+    if (!form.fecha)
+      e2.fecha = 'La fecha de nacimiento es obligatoria.';
 
-  // ❌ Si hay errores, se muestran y NO se limpia nada
-  if (Object.keys(e2).length > 0) {
-    setErrors(e2);
-    return;
-  }
+    if (Object.keys(e2).length > 0) {
+      setErrors(e2);
+      return;
+    }
 
-  // ✅ SI TODO ESTÁ BIEN → LIMPIAR TODO
-  setErrors({});
-  setForm({
-    nombre: '',
-    apellido: '',
-    correo: '',
-    telefono: '',
-    fecha: ''
-  });
-
-  setEnviado(true);
-};
-
-
-
-  const guardar = () => {
-    setContador(contador + 1);
-    setEnviado(false);
+    /* ✅ ENVÍO CORRECTO */
     setForm({
       nombre: '',
       apellido: '',
@@ -167,6 +146,7 @@ const Registro = () => {
       fecha: ''
     });
     setErrors({});
+    setMensaje('Datos enviados correctamente.');
   };
 
   const labels = {
@@ -199,13 +179,6 @@ const Registro = () => {
                 name={campo}
                 value={form[campo]}
                 max={campo === 'fecha' ? hoy : undefined}
-                maxLength={
-                  campo === 'nombre' ||
-                  campo === 'apellido' ||
-                  campo === 'telefono'
-                    ? 70
-                    : undefined
-                }
                 onChange={handleChange}
                 style={styles.input}
               />
@@ -217,21 +190,13 @@ const Registro = () => {
           </div>
         ))}
 
-        {!enviado ? (
-          <button style={styles.button}>Enviar</button>
-        ) : (
-          <button
-            type="button"
-            onClick={guardar}
-            style={{ ...styles.button, background: '#065f46' }}
-          >
-            Guardar
-          </button>
-        )}
+        <button style={styles.button}>Enviar</button>
 
-        <p style={styles.counter}>
-          Registros guardados: <strong>{contador}</strong>
-        </p>
+        {mensaje && (
+          <p style={{ marginTop: '14px', color: '#065f46', textAlign: 'center' }}>
+            {mensaje}
+          </p>
+        )}
       </form>
     </div>
   );
@@ -296,12 +261,6 @@ const styles = {
     fontSize: '15px',
     fontWeight: 600,
     cursor: 'pointer'
-  },
-  counter: {
-    marginTop: '16px',
-    textAlign: 'center',
-    fontSize: '14px',
-    color: '#374151'
   }
 };
 
