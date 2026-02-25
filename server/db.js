@@ -2,11 +2,10 @@ import pkg from 'pg';
 const { Pool } = pkg;
 
 export const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'meteorapp',
-  password: '12345',
-  port: 5432
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 pool.query(`
@@ -19,7 +18,7 @@ pool.query(`
     fecha DATE
   );
 `).then(() => {
-  console.log("Tabla lista");
+  console.log("Tabla lista en producción");
 }).catch(err => {
   console.error("Error creando tabla", err);
 });
