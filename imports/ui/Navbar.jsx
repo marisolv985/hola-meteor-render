@@ -5,6 +5,7 @@ const MAX_BREADCRUMBS = 3;
 const routeMap = {
   '/': 'Inicio',
   '/registro': 'Registrar',
+  '/usuarios': 'Usuarios registrados',
   '/otra-pagina': 'Otra página'
 };
 
@@ -12,14 +13,12 @@ const Navbar = () => {
   const path = window.location.pathname;
   const [breadcrumbs, setBreadcrumbs] = useState([]);
 
-  /* ---------- NAVEGACIÓN ---------- */
   const go = (ruta) => {
     if (path !== ruta) {
       window.location.pathname = ruta;
     }
   };
 
-  /* ---------- HISTORIAL DE BREADCRUMBS ---------- */
   useEffect(() => {
     const stored = JSON.parse(
       sessionStorage.getItem('breadcrumbs') || '[]'
@@ -27,7 +26,6 @@ const Navbar = () => {
 
     const label = routeMap[path] || 'Página';
 
-    // evita duplicados seguidos
     if (stored[stored.length - 1]?.path === path) {
       setBreadcrumbs(stored);
       return;
@@ -53,35 +51,28 @@ const Navbar = () => {
 
   return (
     <header style={styles.header}>
-      {/* -------- FILA SUPERIOR -------- */}
       <div style={styles.topRow}>
         <span style={styles.title}>Hola Meteor</span>
 
         <nav style={styles.nav}>
-          <button
-            onClick={() => go('/')}
-            style={buttonStyle(path === '/')}
-          >
+          <button onClick={() => go('/')} style={buttonStyle(path === '/')}>
             Inicio
           </button>
 
-          <button
-            onClick={() => go('/registro')}
-            style={buttonStyle(path === '/registro')}
-          >
+          <button onClick={() => go('/registro')} style={buttonStyle(path === '/registro')}>
             Registrar
           </button>
 
-          <button
-            onClick={() => go('/otra-pagina')}
-            style={buttonStyle(path === '/otra-pagina')}
-          >
+          <button onClick={() => go('/usuarios')} style={buttonStyle(path === '/usuarios')}>
+            Usuarios registrados
+          </button>
+
+          <button onClick={() => go('/otra-pagina')} style={buttonStyle(path === '/otra-pagina')}>
             Otra página
           </button>
         </nav>
       </div>
 
-      {/* -------- BREADCRUMBS -------- */}
       <div style={styles.breadcrumbs}>
         {breadcrumbs.map((item, index) => {
           const isLast = index === breadcrumbs.length - 1;
@@ -110,7 +101,6 @@ const Navbar = () => {
   );
 };
 
-/* ---------- ESTILOS ---------- */
 const styles = {
   header: {
     background: '#1f2937',

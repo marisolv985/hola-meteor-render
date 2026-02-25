@@ -6,6 +6,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import Navbar from '/imports/ui/Navbar';
 import Carousel from '/imports/ui/Carousel';
 import Registro from '/imports/ui/Registro';
+import TablaRegistros from '/imports/ui/TablaRegistros';
 import NotFound from '/imports/ui/NotFound';
 import AlertModal from '/imports/ui/AlertModal';
 
@@ -51,29 +52,21 @@ const App = () => {
             onChange={onCaptchaChange}
           />
 
-          {/* BOTÓN DINÁMICO */}
           {!enviado ? (
-            <button
-              onClick={enviarHome}
-              style={styles.primaryButton}
-            >
+            <button onClick={enviarHome} style={styles.primaryButton}>
               Enviar
             </button>
           ) : (
-            <button
-              onClick={irARegistro}
-              style={styles.registerButton}
-            >
+            <button onClick={irARegistro} style={styles.registerButton}>
               Ir a registrarse
             </button>
           )}
 
-          {/* BOTÓN IR A OTRA PÁGINA */}
           <button
             onClick={() => (window.location.pathname = '/otra-pagina')}
             style={styles.secondaryButton}
           >
-            Ir a otra página(simulada error 404)
+            Ir a otra página (simulada error 404)
           </button>
         </div>
       )}
@@ -81,20 +74,26 @@ const App = () => {
       {/* ---------- REGISTRO ---------- */}
       {path === '/registro' && <Registro />}
 
+      {/* ---------- USUARIOS REGISTRADOS ---------- */}
+      {path === '/usuarios' && <TablaRegistros />}
+
       {/* ---------- NOT FOUND ---------- */}
-      {path !== '/' && path !== '/registro' && <NotFound />}
+      {path !== '/' &&
+        path !== '/registro' &&
+        path !== '/usuarios' &&
+        <NotFound />
+      }
 
-      {/* ---------- ALERTA BONITA ---------- */}
+      {/* ---------- ALERTA ---------- */}
       <AlertModal
-  message={alertMessage}
-  onClose={() => {
-    if (alertMessage === 'Los datos se enviaron correctamente.') {
-      setEnviado(true);
-    }
-    setAlertMessage('');
-  }}
-/>
-
+        message={alertMessage}
+        onClose={() => {
+          if (alertMessage === 'Los datos se enviaron correctamente.') {
+            setEnviado(true);
+          }
+          setAlertMessage('');
+        }}
+      />
     </>
   );
 };
@@ -126,7 +125,7 @@ const styles = {
     width: '100%',
     marginTop: '20px',
     padding: '14px',
-    background: '#2563eb', // azul para diferenciar
+    background: '#2563eb',
     color: '#ffffff',
     border: 'none',
     borderRadius: '6px',
@@ -151,3 +150,5 @@ const styles = {
 Meteor.startup(() => {
   createRoot(document.getElementById('react-target')).render(<App />);
 });
+
+export default App;

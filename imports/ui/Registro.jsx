@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { Meteor } from 'meteor/meteor';
 
-/* ---------- ICONOS SVG (CORREGIDOS) ---------- */
+/* ---------- ICONOS SVG ---------- */
 const Icon = ({ children }) => (
   <svg
     width="18"
@@ -68,7 +69,7 @@ const Registro = () => {
   const [errors, setErrors] = useState({});
   const [mensaje, setMensaje] = useState('');
 
-  /* ---------- VALIDACIONES (NO TOCADAS) ---------- */
+  /* ---------- VALIDACIONES ORIGINALES ---------- */
   const handleChange = (e) => {
     const { name, value } = e.target;
     let error = '';
@@ -137,16 +138,21 @@ const Registro = () => {
       return;
     }
 
-    /* ✅ ENVÍO CORRECTO */
-    setForm({
-      nombre: '',
-      apellido: '',
-      correo: '',
-      telefono: '',
-      fecha: ''
+    Meteor.call("crearRegistro", form, (error) => {
+      if (error) {
+        setMensaje("Error al guardar en la base de datos.");
+      } else {
+        setForm({
+          nombre: '',
+          apellido: '',
+          correo: '',
+          telefono: '',
+          fecha: ''
+        });
+        setErrors({});
+        setMensaje('Datos enviados correctamente.');
+      }
     });
-    setErrors({});
-    setMensaje('Datos enviados correctamente.');
   };
 
   const labels = {
@@ -179,6 +185,13 @@ const Registro = () => {
                 name={campo}
                 value={form[campo]}
                 max={campo === 'fecha' ? hoy : undefined}
+                maxLength={
+                  campo === 'nombre' ||
+                  campo === 'apellido' ||
+                  campo === 'telefono'
+                    ? 70
+                    : undefined
+                }
                 onChange={handleChange}
                 style={styles.input}
               />
@@ -191,6 +204,15 @@ const Registro = () => {
         ))}
 
         <button style={styles.button}>Enviar</button>
+
+        {/* SOLO agregamos este botón */}
+        <button
+          type="button"
+          onClick={() => window.location.pathname = "/usuarios"}
+          style={styles.viewButton}
+        >
+          Ver registros
+        </button>
 
         {mensaje && (
           <p style={{ marginTop: '14px', color: '#065f46', textAlign: 'center' }}>
@@ -222,11 +244,9 @@ const styles = {
   title: {
     textAlign: 'center',
     marginBottom: '24px',
-    color: '#111827',
     fontWeight: 600
   },
   label: {
-    color: '#374151',
     fontSize: '13px',
     marginBottom: '4px',
     display: 'block'
@@ -241,9 +261,7 @@ const styles = {
     width: '100%',
     padding: '12px 14px 12px 44px',
     border: '1px solid #d1d5db',
-    borderRadius: '6px',
-    fontSize: '14px',
-    boxSizing: 'border-box'
+    borderRadius: '6px'
   },
   error: {
     color: '#dc2626',
@@ -255,12 +273,18 @@ const styles = {
     marginTop: '16px',
     padding: '14px',
     background: '#1f2937',
-    color: '#f9fafb',
+    color: '#fff',
     border: 'none',
-    borderRadius: '6px',
-    fontSize: '15px',
-    fontWeight: 600,
-    cursor: 'pointer'
+    borderRadius: '6px'
+  },
+  viewButton: {
+    width: '100%',
+    marginTop: '10px',
+    padding: '12px',
+    background: '#2563eb',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '6px'
   }
 };
 
