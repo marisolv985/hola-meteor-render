@@ -1,11 +1,15 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 
+const isProduction = process.env.NODE_ENV === "production";
+
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  ...(isProduction && {
+    ssl: {
+      rejectUnauthorized: false
+    }
+  })
 });
 
 pool.query(`
@@ -18,7 +22,7 @@ pool.query(`
     fecha DATE
   );
 `).then(() => {
-  console.log("Tabla lista en producción");
+  console.log("Tabla lista");
 }).catch(err => {
   console.error("Error creando tabla", err);
 });
