@@ -86,6 +86,9 @@ Meteor.methods({
 
  async actualizarRegistro(id, data) {
 
+  console.log("🔥 EDITANDO ID:", id);
+  console.log("🔥 DATA:", data);
+
   if (!id) {
     throw new Meteor.Error("ID inválido");
   }
@@ -101,14 +104,34 @@ Meteor.methods({
          fecha=$5
      WHERE id=$6
      RETURNING *`,
-    [nombre, apellido, correo, telefono, fecha, id]
+    [
+      nombre,
+      apellido,
+      correo,
+      telefono,
+      fecha,
+      Number(id) // 🔥 FORZAMOS A NÚMERO
+    ]
   );
 
   if (result.rows.length === 0) {
-    throw new Meteor.Error("No se encontró el registro");
+    throw new Meteor.Error("No se encontró el registro para actualizar");
   }
 
   return result.rows[0];
-}
+},
+
+async eliminarRegistro(id) {
+    if (!id) {
+      throw new Meteor.Error("ID inválido");
+    }
+
+    await pool.query(
+      `DELETE FROM registros WHERE id=$1`,
+      [id]
+    );
+
+    return true;
+  },
 
 });
